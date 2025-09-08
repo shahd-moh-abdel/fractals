@@ -50,21 +50,12 @@ float circle(vec2 uv, vec2 center, float rad)
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
   vec2 uv = fragCoord.xy / iResolution.xy;
-  vec2 mouse = iMouse.xy / iResolution.xy;
-  
-  vec3 color = vec3(0.8, 0.8, 1.0);
-  //vec3 pct = vec3(sin(uv.x * PI));
-  
-  //color = mix(colorA, colorB, pct);
-  
-  //color = mix(color, vec3(1.0, 0.0, 0.0), plot(uv, pct.r));
-  //color = mix(color, vec3(0.0, 1.0, 0.0), plot(uv, pct.g - 0.1));
-  //color = mix(color, vec3(0.0, 0.0, 1.0), plot(uv, pct.b - 0.2));
+  uv = uv  * 2.0 - 1.0;
+  uv.x *= iResolution.x / iResolution.y;
 
-  vec2 center = mouse.xy;
-  float newCircle = circle(uv, center, 0.5);
-
-  color = vec3(newCircle, 0.7, 0.7);
+  //gradient bg
+  vec3 color = vec3(0.1 + 0.1 * uv.x, 0.2 + 0.1 * uv.y, 0.3);
+  
   fragColor = vec4(color, 1.0);
 }
 

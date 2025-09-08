@@ -6,8 +6,8 @@
 
 using namespace std;
 
-#define SCREEN_WIDTH 600
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 1200
+#define SCREEN_HEIGHT 800
 
 void processInput(GLFWwindow * window)
 {
@@ -100,7 +100,7 @@ static unsigned int createShader(const string& vertexShader, const string& fragm
 GLFWwindow* windowSetUp() {
   glfwInit();
   
-  GLFWwindow* window = glfwCreateWindow(600, 600, "Fractals", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Fractals", NULL, NULL);
   if (!window)
     {
       cout << "Error creating the window " << endl;
