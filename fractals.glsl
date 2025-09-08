@@ -21,39 +21,34 @@ uniform vec4 iMouse;
 out vec4 fragColor;
 
 #define PI 3.14159
-#define MAX_ITERATIONS 80
+#define MAX_ITERATIONS 100
 
-vec3 getColor(int iterations)
+vec3 palette(float t)
 {
-  if (iterations >= MAX_ITERATIONS)
-    return vec3(0.0);
+  vec3 a = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  vec3 d = vec3(0.263, 0.416, 0.557);
 
-  float t = float(iterations) / float(MAX_ITERATIONS);
-
-  vec3 color1 = vec3(0.0, 0.0, 0.5);
-  vec3 color2 = vec3(1.0, 0.5, 0.0);
-  vec3 color3 = vec3(1.0, 1.0, 0.0);
-
-  if (t < 0.5)
-    {
-      return mix(color1, color2, t * 2.0);
-    }
-  else
-    {
-      return mix(color2, color3, (t - 0.5) * 2.0);
-    }
+  return a + b * cos(6.3 * (c * t + d));
 }
 
-int mandelbrot(vec2 c)
+float mandelbrot(vec2 c)
 {
   vec2 z = vec2(0.0);
-  int iterations = 0;
+  float iterations = 0.0;
 
   for (int i = 0; i < MAX_ITERATIONS; i++)
     {
-      if (dot(z, z) > 4.0) break;
+      if (dot(z, z) > 4.0)
+	{
+	  float log_zn = log(dot(z, z)) / 2.0;
+	  float nu = log(log_zn / log(2.0)) / log(2.0);
+	  iterations = float(i) + 1.0 - nu;
+	  break;
+	}
       z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
-      iterations++;
+      iterations = float(i + 1);
     }
 
   return iterations;
@@ -67,10 +62,18 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
   vec2 c = uv * 2.0 + vec2(-0.5, 0.0);
 
-  int iterations = mandelbrot(c);
+  float iterations = mandelbrot(c);
 
-  //gradient bg
-  vec3 color = getColor(iterations);
+  vec3 color;
+  if(iterations >= float(MAX_ITERATIONS))
+    {
+      color = vec3(0.0);
+    }
+  else
+    {
+      float t = iterations / float(MAX_ITERATIONS);
+      color = palette(t);
+    }
   
   fragColor = vec4(color, 1.0);
 }
