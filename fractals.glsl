@@ -21,30 +21,21 @@ uniform vec4 iMouse;
 out vec4 fragColor;
 
 #define PI 3.14159
+#define MAX_ITERATIONS 50
 
-vec3 colorA = vec3(1.0, 0.0, 0.0);
-vec3 colorB = vec3(0.0, 0.0, 1.0);
-
-float plot (vec2 uv, float pct)
+int mandelbrot(vec2 c)
 {
-  return smoothstep(pct - 0.01, pct, uv.y) - smoothstep(pct, pct + 0.01, uv.y);
-}
+  vec2 z = vec2(0.0);
+  int iterations = 0;
 
-float borders(vec2 uv, float width)
-{
-  float left = step(width, uv.x);
-  float right = step(width, 1.0-uv.x);
+  for (int i = 0; i < MAX_ITERATIONS; i++)
+    {
+      if (dot(z, z) > 4.0) break;
+      z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+      iterations++;
+    }
 
-  float bottom = step(width, uv.y);
-  float top = step(width, 1.0-uv.y);
-
-  return left * right * bottom * top;
-}
-
-float circle(vec2 uv, vec2 center, float rad)
-{
-  float pct = distance(uv, center);
-  return step(rad, pct);
+  return iterations;
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -53,8 +44,16 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   uv = uv  * 2.0 - 1.0;
   uv.x *= iResolution.x / iResolution.y;
 
+  vec2 c = uv * 2.0 + vec2(-0.5, 0.0);
+
+  int iterations = mandelbrot(c);
+
   //gradient bg
-  vec3 color = vec3(0.1 + 0.1 * uv.x, 0.2 + 0.1 * uv.y, 0.3);
+  vec3 color = vec3(0.0);
+  if(iterations < MAX_ITERATIONS)
+    {
+      color = vec3(1.0);
+    }
   
   fragColor = vec4(color, 1.0);
 }
