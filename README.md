@@ -32,7 +32,7 @@ then run the app:
 ./app
 ```
 
-or install the pre-built version from itch.io [here](www.google.com).
+or install the pre-built version from itch.io [here](https://shahd-moh-abdel.itch.io/mandelbrot).
 
 ## Tech Stack
 - OpenGL/GLSL
