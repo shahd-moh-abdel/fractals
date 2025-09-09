@@ -26,7 +26,7 @@ out vec4 fragColor;
 vec3 palette(float t)
 {
   vec3 a = vec3(0.5, 0.5, 0.5);
-  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.9, 0.5);
   vec3 c = vec3(1.0, 1.0, 1.0);
   vec3 d = vec3(0.263, 0.416, 0.557);
 
@@ -60,7 +60,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   uv = uv  * 2.0 - 1.0;
   uv.x *= iResolution.x / iResolution.y;
 
-  vec2 c = uv * 2.0 + vec2(-0.5, 0.0);
+  float zoom = 0.1 * iTime;
+  vec2 center = vec2(0.5, 0.5);
+
+  vec2 c = uv / zoom + center;
 
   float iterations = mandelbrot(c);
 
@@ -72,7 +75,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   else
     {
       float t = iterations / float(MAX_ITERATIONS);
-      color = palette(t);
+      color = palette(t + iTime * 0.01);
     }
   
   fragColor = vec4(color, 1.0);
