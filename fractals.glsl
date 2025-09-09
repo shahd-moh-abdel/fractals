@@ -17,7 +17,9 @@ void main()
 
 uniform vec3 iResolution;
 uniform float iTime;
-uniform vec4 iMouse;     
+uniform vec4 iMouse;
+uniform float iZoom;
+uniform vec2 iCenter;
 out vec4 fragColor;
 
 #define PI 3.14159
@@ -57,11 +59,18 @@ float mandelbrot(vec2 c)
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
   vec2 uv = fragCoord.xy / iResolution.xy;
+  
   uv = uv  * 2.0 - 1.0;
   uv.x *= iResolution.x / iResolution.y;
 
-  float zoom = 0.1 * iTime;
-  vec2 center = vec2(0.5, 0.5);
+  float zoom = iZoom;
+  vec2 center = iCenter;
+
+  if (zoom == 0.0)
+    {
+      zoom = 1.0;
+      center = vec2(-0.5, 0.0);
+    }
 
   vec2 c = uv / zoom + center;
 

@@ -6,16 +6,30 @@
 
 using namespace std;
 
-#define SCREEN_WIDTH 1200
+#define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 
 double mouseX = 0.0, mouseY = 0.0;
 bool mousePressed = false;
+double zoomLevel = 1.0;
+double centerX = -0.5, centerY = 0.0;
 
 void processInput(GLFWwindow * window)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+
+  if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS)
+    zoomLevel *= 1.02;
+  if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS)
+    zoomLevel *= 0.98;
+
+  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+      zoomLevel = 1.0;
+      centerX = -0.5;
+      centerY = 0.0;
+    }
 }
 
 void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
@@ -25,8 +39,7 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
       if (action == GLFW_PRESS)
 	{
 	  mousePressed = true;
-	  glfwGetCursorPos(window, &mouseX, &mouseY);
-	  cout << "mouse clicked at (" << mouseX << ", " << mouseY << ")" << endl; 
+	  glfwGetCursorPos(window, &mouseX, &mouseY); 
 	}
       else if (action == GLFW_RELEASE)
 	{
@@ -34,6 +47,14 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
 	}
 	
     }
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  double zoomFactor = (yoffset > 0) ? 1.2 : 0.8;
+  zoomLevel *= zoomFactor;
+
+  cout << "zoom level: " << zoomLevel << endl;
 }
 
 struct shaderProgramSource
@@ -138,6 +159,7 @@ GLFWwindow* windowSetUp() {
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   glfwSetMouseButtonCallback(window, mouseButtonCallBack);
+  glfwSetScrollCallback(window, scrollCallback);
 
   return window;
 }
@@ -177,6 +199,8 @@ int main()
   int iResLoc = glGetUniformLocation(shader, "iResolution");
   int iTimeLoc = glGetUniformLocation(shader, "iTime");
   int iMouseLoc = glGetUniformLocation(shader, "iMouse");
+  int iZoomLoc = glGetUniformLocation(shader, "iZoom");
+  int iCenterLoc = glGetUniformLocation(shader, "iCenter");
 
   double startTime = glfwGetTime();
   
@@ -202,6 +226,12 @@ int main()
       //get mouse pos
       if (iMouseLoc != -1)
 	glUniform4f(iMouseLoc, currentMouseX, currentMouseY, mousePressed ? 1.0 : 0.0f, 0.0f);
+
+      if (iZoomLoc != -1)
+	glUniform1f(iZoomLoc, zoomLevel);
+
+      if (iCenterLoc != -1)
+	glUniform2f(iCenterLoc, centerX, centerY);
  
       
       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
