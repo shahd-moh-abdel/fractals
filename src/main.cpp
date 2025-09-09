@@ -51,10 +51,23 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-  double zoomFactor = (yoffset > 0) ? 1.2 : 0.8;
-  zoomLevel *= zoomFactor;
+  double currentMouseX, currentMouseY;
+  glfwGetCursorPos(window, &currentMouseX, &currentMouseY);
 
-  cout << "zoom level: " << zoomLevel << endl;
+  double normalizedX = (currentMouseX / SCREEN_WIDTH) * 2.0 - 1.0;
+  double normalizedY = ((SCREEN_HEIGHT - currentMouseY) / SCREEN_HEIGHT) * 2.0 - 1.0;
+
+  normalizedX *= (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT;
+
+  double complexX = normalizedX / zoomLevel + centerX;
+  double complexY = normalizedY / zoomLevel + centerY;
+  
+  double zoomFactor = (yoffset > 0) ? 1.2 : 0.8;
+
+  centerX = complexX - normalizedX / (zoomLevel * zoomFactor);
+  centerY = complexY - normalizedY / (zoomLevel * zoomFactor);
+  
+  zoomLevel *= zoomFactor;
 }
 
 struct shaderProgramSource

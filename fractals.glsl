@@ -23,7 +23,7 @@ uniform vec2 iCenter;
 out vec4 fragColor;
 
 #define PI 3.14159
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 500
 
 vec3 palette(float t)
 {
