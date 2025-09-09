@@ -9,10 +9,31 @@ using namespace std;
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
 
+double mouseX = 0.0, mouseY = 0.0;
+bool mousePressed = false;
+
 void processInput(GLFWwindow * window)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+}
+
+void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
+{
+  if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+      if (action == GLFW_PRESS)
+	{
+	  mousePressed = true;
+	  glfwGetCursorPos(window, &mouseX, &mouseY);
+	  cout << "mouse clicked at (" << mouseX << ", " << mouseY << ")" << endl; 
+	}
+      else if (action == GLFW_RELEASE)
+	{
+	  mousePressed = false;
+	}
+	
+    }
 }
 
 struct shaderProgramSource
@@ -116,6 +137,8 @@ GLFWwindow* windowSetUp() {
 
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+  glfwSetMouseButtonCallback(window, mouseButtonCallBack);
+
   return window;
 }
 
@@ -172,14 +195,14 @@ int main()
       if (iResLoc != -1)
 	glUniform3f(iResLoc, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
 
+      double currentMouseX, currentMouseY;
+      glfwGetCursorPos(window, &currentMouseX, &currentMouseY);
+      currentMouseY = SCREEN_HEIGHT - currentMouseY;
+      
       //get mouse pos
       if (iMouseLoc != -1)
-	{
-	  double mouseX, mouseY;
-	  glfwGetCursorPos(window, &mouseX, &mouseY);
-	  mouseY =  SCREEN_HEIGHT - mouseY;
-	  glUniform4f(iMouseLoc, mouseX, mouseY, 0.0f, 0.0f);
-	}
+	glUniform4f(iMouseLoc, currentMouseX, currentMouseY, mousePressed ? 1.0 : 0.0f, 0.0f);
+ 
       
       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
       
